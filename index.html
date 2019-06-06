@@ -1,0 +1,160 @@
+<html>
+
+	<head>
+		
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.1.0/react.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.1.0/react-dom.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.24.0/babel.js"></script>
+		<script src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js'></script>
+		<link rel="stylesheet" href="./css/mycss.css">
+		
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"> 
+		<!--<script type="text/babel" src="js/myjs.js"></script>  
+						NOTE:Causes an error when importing-->
+	</head>
+
+	<body>
+
+
+
+	   <div id='root'></div>
+		<script type="text/babel">
+			class App extends React.Component{
+				constructor(){
+					super();
+					this.state={
+						initialArray:["hummus", "sabich", "shakshuka", "salad", "baklava", "falafel"],
+						randomisedArray:[],
+						finalArray:[],
+						openedArray:[],
+						counter:0
+					}
+					this.start();
+					this.clicked=this.clicked.bind(this);
+				}
+				//methods here
+				start(){
+				let finalArray=[];
+				this.state.initialArray=this.state.initialArray.concat(this.state.initialArray);
+				this.state.randomisedArray=this.shuffle(this.state.initialArray);
+				
+
+				this.state.randomisedArray.map(name=>{
+					finalArray.push({
+					name,
+					close:true,
+					complete:false,
+					fail:false
+					})
+				})
+				this.state.finalArray=finalArray;
+				}
+
+				clicked(food, index){
+					if(this.state.openedArray.length==2){
+						setTimeout(()=>{
+						this.check(index)
+						},2000)
+					}else if(this.state.openedArray==0|| this.state.openedArray[0].index!=index){
+						
+						let finalArray=this.state.finalArray;
+						let foods=this.state.openedArray;
+						let foodObject={
+							name:food,
+							index
+						}
+						
+						finalArray[index].close=false;
+						foods.push(foodObject);
+						this.setState({
+							openedArray:foods,
+							finalArray:finalArray,
+							counter:this.state.counter+1
+						})
+						if(foods.length==2){
+							setTimeout(()=>{
+							this.check(index)
+							},2000)
+						}
+					}
+						
+		
+				}
+				check(){
+					var one=this.state.openedArray[0];
+					var two=this.state.openedArray[1];
+					var finalArray=this.state.finalArray;
+					if(one.name==two.name){
+						finalArray[one.index].complete=true;
+						finalArray[two.index].complete=true;
+					}else {
+						finalArray[one.index].close=true;
+						finalArray[two.index].close=true;
+					}
+					
+					this.setState({
+						finalArray,
+						openedArray:[],
+					})
+				}
+				shuffle(array){
+					
+					var output=[];
+					var i=0;
+					while(array.length!=0){
+						var itemIndex=Math.floor(Math.random() * array.length);
+						output[i]=array.splice(itemIndex,1)[0];
+						i++;
+						
+						
+					}
+					return output;
+				}
+				render(){
+					//const cards=
+					return(
+						<div className="wrapper">
+							<div className="counter">
+								{this.state.counter}
+							</div>
+							<div className="container">
+								
+								{
+								this.state.finalArray.map((food,index)=>
+									<div className="card" onClick={()=>this.clicked(food.name,index)}>
+										<div className= {`front ${this.state.finalArray[index].close? "hide":"show" }`}>
+											<img src={`./images/${food.name}.jpeg`} />
+										</div>
+										<div className={`back ${this.state.finalArray[index].close? "show":"hide" }`} >
+											
+										</div>
+									</div>
+							)}
+								
+							</div>
+							
+						</div>
+					);
+				}	
+			}
+
+			/*class card extends React.Component{
+				render(){
+					return(
+						
+					
+					);
+				}}*/
+
+
+			ReactDOM.render(
+						<App />,
+						document.getElementById('root')
+					);
+
+		</script   
+	
+	</body>
+</html>
+
